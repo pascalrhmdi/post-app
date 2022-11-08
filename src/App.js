@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import "./App.css";
+import { Navigation } from "./components";
 
 function App() {
+  useEffect(() => {
+    const navbar = document.querySelector(".navbar");
+    const navbarHeight = navbar.offsetHeight;
+    const mainTag = document.querySelector("main");
+    mainTag.style.marginTop = `${navbarHeight}px`;
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <>
+      <header>
+        <Navigation />
       </header>
-    </div>
+      <main>
+        <Outlet />
+      </main>
+      {/* <footer className="shadow-apps mt-3 py-3 bg-white">
+        <Footer />
+      </footer> */}
+    </>
   );
 }
+
 
 export default App;
