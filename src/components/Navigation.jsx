@@ -1,8 +1,6 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
-import { pokemonLogo } from "../assets";
+import { Link, NavLink } from "react-router-dom";
 
 export default function Navigation() {
-  const location = useLocation();
   const isLoggedIn = JSON.parse(window.localStorage.getItem("token"));
   const user = JSON.parse(window.localStorage.getItem("user"));
 
@@ -13,9 +11,9 @@ export default function Navigation() {
   return (
     <nav className="navbar navbar-expand-lg fixed-top shadow-sm bg-white">
       <div className="container-xl">
-        <NavLink className="navbar-brand" to="/">
+        {/* <NavLink className="navbar-brand" to="/">
           <img src={pokemonLogo} alt="LogoJabarSejahtera" height="50" />
-        </NavLink>
+        </NavLink> */}
         <button
           className="navbar-toggler"
           type="button"
@@ -59,8 +57,9 @@ export default function Navigation() {
                         className="dropdown-item text-danger"
                         to=""
                         onClick={() => {
-                          window.localStorage.removeItem("token");
-                          window.localStorage.removeItem("user");
+                          localStorage.removeItem("token");
+                          localStorage.removeItem("user");
+                          window.location.href = "/login";
                         }}
                       >
                         <i className="bi bi-door-open-fill text-danger me-2"></i>

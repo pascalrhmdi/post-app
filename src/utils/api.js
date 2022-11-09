@@ -1,5 +1,3 @@
-const baseUrl = 'http://JCC.brandingyou.id/api'
+const baseUrl = "https://jcc.brandingyou.id/api";
 
-export {
-  baseUrl
-};
+export { baseUrl };

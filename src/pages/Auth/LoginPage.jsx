@@ -1,6 +1,17 @@
 import axios from "axios";
 import React, { useEffect } from "react";
-import { Button, Col, Container, Form, Row, Spinner, Stack, Toast, ToastContainer } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  FloatingLabel,
+  Form,
+  Row,
+  Spinner,
+  Stack,
+  Toast,
+  ToastContainer
+} from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { baseUrl } from "../../utils";
 import { useLocalStorage } from "../../utils/hooks/useLocalStorage";
@@ -12,9 +23,12 @@ export default function LoginPage() {
     message: "",
     variant: "success",
   });
-  const [user, setUser] = useLocalStorage("user", null);
   const [token, setToken] = useLocalStorage("token", null);
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState({
+    email: [],
+    password: [],
+  });
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,17 +57,12 @@ export default function LoginPage() {
       const { data } = await axios.post(`${baseUrl}/login`, form);
       if (data.meta.code === 200) {
         const user = filterJsonForUserStorage(data.data.user);
-        setUser(user);
+        localStorage.setItem("user", JSON.stringify(user));
         setToken(data.data.token);
-        navigate("/", {
-          state: {
-            title: "Login Success",
-            message: data.meta.message,
-            variant: "success",
-          },
-        });
+        navigate("/");
       }
     } catch (error) {
+      setError(error.response.data.data);
       showToast("Masuk Gagal", `${error.response.data.meta.message} `, "danger");
     } finally {
       setLoading(false);
@@ -62,38 +71,31 @@ export default function LoginPage() {
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
+
     const data = {
       username: e.target.username.value,
       password: e.target.password.value,
     };
     loginAction(data);
+    // setValidated(true);
   };
 
   return (
     <Container className="vh-100 d-flex align-items-center justify-content-center">
       <Col xs={6} md={5} lg={4}>
-        <Form onSubmit={onSubmitHandler} className="card p-4 shadow-app">
+        <Form onSubmit={onSubmitHandler}  noValidate  className="card px-5 py-4 shadow-app">
           <h2 className="mb-4 text-center">Silahkan Masuk</h2>
-          <Form.Group style={{ marginBottom: -1 }} className="" controlId="formBasicUsername">
-            {/* <Form.Label>Email address</Form.Label> */}
-            <Form.Control
-              size="lg"
-              type="text"
-              name="username"
-              placeholder="Enter username"
-              style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+          <FloatingLabel controlId="floatingUsername" label="Username" className="mb-1">
+            <Form.Control type="text" name="username" placeholder="Enter username" required isInvalid={error.username?.length >= 1 }
             />
-          </Form.Group>
-          <Form.Group className="mb-2" controlId="formBasicPassword">
-            {/* <Form.Label>Password</Form.Label> */}
-            <Form.Control
-              size="lg"
-              type="password"
-              name="password"
-              placeholder="Password"
-              style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
-            />
-          </Form.Group>
+            <Form.Control.Feedback type="invalid">{error.username?.[0]}</Form.Control.Feedback>
+            <Form.Control.Feedback type="valid">Mantap Jiwa!</Form.Control.Feedback>
+          </FloatingLabel>
+          <FloatingLabel controlId="floatingPassword" label="Password" className="mb-1">
+            <Form.Control type="password" name="password" placeholder="Password" required isInvalid={error.password?.length >= 1 }  />
+            <Form.Control.Feedback type="invalid">{error.password?.[0]}</Form.Control.Feedback>
+            <Form.Control.Feedback type="valid">Mantap Jiwa!</Form.Control.Feedback>
+          </FloatingLabel>
           <Row className="justify-content-end my-2">
             <Link to="/register" className="btn btn-link text-decoration-none text-dark text-end">
               Daftar
@@ -110,7 +112,7 @@ export default function LoginPage() {
           </Stack>
         </Form>
       </Col>
-      <ToastContainer className="p-3" position={"bottom-end"}>
+      <ToastContainer className="p-3 position-fixed" position={"bottom-end"}>
         <Toast
           show={toast.show}
           onClose={() => setToast((prev) => ({ ...prev, show: false }))}
