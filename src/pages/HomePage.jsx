@@ -283,7 +283,7 @@ export default function HomePage() {
             <Stack>
               <Button type="submit" disabled={loading} variant={isEdit ? "warning" : "primary"}>
                 {loading && <Spinner as="span" size="sm" role="status" aria-hidden="true" className="me-1" />}
-                Submit
+                {isEdit ? "Edit" : "Tambah"}
               </Button>
             </Stack>
           </Form>

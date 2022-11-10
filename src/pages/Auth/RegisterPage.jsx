@@ -58,7 +58,6 @@ export default function RegisterPage() {
         });
       }
     } catch (error) {
-      console.error(error.response.data.data);
       setError(error.response.data.data);
       showToast("Gagal Daftar", error.response.data.meta.message, "danger");
     } finally {

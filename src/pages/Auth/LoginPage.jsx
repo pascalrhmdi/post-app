@@ -77,7 +77,6 @@ export default function LoginPage() {
       password: e.target.password.value,
     };
     loginAction(data);
-    // setValidated(true);
   };
 
   return (
