@@ -68,6 +68,7 @@ export default function RegisterPage() {
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
+
     const data = {
       name: e.target.name.value,
       email: e.target.email.value,
@@ -80,7 +81,7 @@ export default function RegisterPage() {
   return (
     <Container className="vh-100 d-flex align-items-center justify-content-center">
       <Col xs={7} md={6} lg={5}>
-        <Form onSubmit={onSubmitHandler} className="card p-4 shadow-app">
+        <Form onSubmit={onSubmitHandler} noValidate className="card p-4 shadow-app">
           <h2 className="mb-4 text-center">Silahkan Daftar</h2>
           <FloatingLabel controlId="floatingName" label="Nama Lengkap" className="mb-1">
             <Form.Control type="text" name="name" placeholder="Masukkan Nama Lengkap" isInvalid={error.name?.length >= 1 }/>

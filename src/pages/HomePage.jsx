@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import {
+  Alert,
   Button,
   ButtonGroup,
   Card,
@@ -8,6 +9,7 @@ import {
   Container,
   FloatingLabel,
   Form,
+  Image,
   Ratio,
   Row,
   Spinner,
@@ -100,18 +102,7 @@ export default function HomePage() {
       });
       if (data.meta.status === "success") {
         showToast("Success", data.meta.message, "success");
-        setInput({
-          id: "",
-          title: "",
-          content: "",
-          image: "",
-        });
-        setError({
-          title: [],
-          content: [],
-          image: [],
-        })
-        document.getElementById("form").reset();
+        resetForm();
       }
       getPosts();
     } catch (error) {
@@ -162,23 +153,10 @@ export default function HomePage() {
       });
       if (data.meta.status === "success") {
         showToast("Success", data.meta.message, "success");
-        setIsEdit(false);
-        setInput({
-          id: "",
-          title: "",
-          content: "",
-          image: "",
-        });
-        setError({
-          title: [],
-          content: [],
-          image: [],
-        })
-        document.getElementById("form").reset();
+        resetForm();
       }
       getPosts();
     } catch (error) {
-      // console.error(error);
       if (error.response.data.message === "Unauthenticated.") {
         const pesan = "Token expired, please login again";
         showToast("Unauthenticated", pesan, "danger");
@@ -187,7 +165,6 @@ export default function HomePage() {
         setTimeout(() => {
           navigate("/login");
         }, 2000); // 2 detik
-
       } else {
         setError(error.response.data.data);
         showToast("Gagal Menghapus Data", `${error.message}`, "danger");
@@ -197,7 +174,7 @@ export default function HomePage() {
     }
   };
 
-  const handleOnSubmit = (e) => {
+  function handleOnSubmit(e) {
     e.preventDefault();
 
     const formData = new FormData();
@@ -210,9 +187,9 @@ export default function HomePage() {
     } else {
       createPost(formData);
     }
-  };
+  }
 
-  const setEditStatus = (post) => {
+  function setEditStatus(post) {
     setInput({
       id: post.id,
       title: post.title,
@@ -220,14 +197,30 @@ export default function HomePage() {
       image: post.image,
     });
     setIsEdit(true);
-    window.location.href = "#form";
-  };
+    window.location.href = "#heading";
+  }
+
+  function resetForm() {
+    setInput({
+      id: "",
+      title: "",
+      content: "",
+      image: "",
+    });
+    setError({
+      title: [],
+      content: [],
+      image: [],
+    });
+    setIsEdit(false);
+    document.getElementById("form").reset();
+  }
 
   return (
     <Container className="bg-white">
       <Row className="py-3 justify-content-center" xs={2}>
         <Col>
-          <h1 className="text-center mb-3">
+          <h1 className="text-center mb-3" id="heading">
             <i>
               Artikel Harian
               <br />
@@ -235,6 +228,15 @@ export default function HomePage() {
             </i>
           </h1>
           <Form onSubmit={handleOnSubmit} noValidate id="form">
+            {isEdit ? (
+              <Alert variant={"warning"}>
+                Anda sedang dalam kondisi mengedit. <br />
+                Jika ingin membuat artikel baru, silahkan klik tombol dibawah ini. <br />
+                <Button variant="link" onClick={resetForm} className="p-0 m-0 mt-0">
+                  Batal Edit
+                </Button>
+              </Alert>
+            ) : null}
             <FloatingLabel controlId="floatingJudul" label="Judul Acara" className="mb-3">
               <Form.Control
                 value={input.title}
@@ -260,7 +262,14 @@ export default function HomePage() {
               <Form.Control.Feedback type="invalid">{error.content?.[0]}</Form.Control.Feedback>
               <Form.Control.Feedback type="valid">Mantap Jiwa!</Form.Control.Feedback>
             </FloatingLabel>
-            <Form.Group controlId="formFile" className="mb-3">
+            <Form.Group controlId="formFile" className="mb-3 text-center">
+              {
+                input.image instanceof File ? (
+                  <Image src={URL.createObjectURL(input.image)} rounded fluid className="text-center mb-1" />
+                ) : (
+                  input.image && <Image src={input.image} rounded fluid className="text-center mb-1" />
+                )
+              }
               <Form.Control
                 onChange={(e) => setInput((prevValue) => ({ ...prevValue, [e.target.name]: e.target.files[0] }))}
                 type="file"
@@ -272,7 +281,7 @@ export default function HomePage() {
               <Form.Control.Feedback type="valid">Mantap Jiwa!</Form.Control.Feedback>
             </Form.Group>
             <Stack>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading} variant={isEdit ? "warning" : "primary"}>
                 {loading && <Spinner as="span" size="sm" role="status" aria-hidden="true" className="me-1" />}
                 Submit
               </Button>
